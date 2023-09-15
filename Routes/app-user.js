@@ -40,7 +40,7 @@ userRoutes.post('/resetPass', async (req, res) => {
             const token = jwt.sign({ email: payload.email }, process.env.JWT_KEY, { expiresIn: "1hr" });
             const link = `/verifypass?token=${token}`;
             
-            transporter.sendMail({ ...mailOptions, to: payload.email, text: `Please verify your email ${link}` }, function (error, info) {
+            transporter.sendMail({ ...mailOptions, to: payload.email, text: `Please copy this and paste it in the existing url: ${link}` }, function (error, info) {
                 if (error) {
                     console.log(error);
                 } else {
