@@ -67,7 +67,7 @@ userRoutes.post('/resetPass', async (req, res) => {
 userRoutes.get("/userInfo/:email", async (req, res) => {
     try {
         const { email } = req.params
-        const userInfo = await usermodel.findOne({ email }, { id: 1, name: 1, email: 1, role: 1, _id: 0 ,token:1 })
+        const userInfo = await usermodel.findOne({ email }, { id: 1, name: 1, email: 1, role: 1, _id: 0 ,verify_link:1 })
         res.send(userInfo)
     } catch (err) {
         res.status(500).send(err.message)
