@@ -35,7 +35,7 @@ userRoutes.post("/register", async (req, res) => {
 userRoutes.post('/resetPass', async (req, res) => {
     try {
         const payload = req.body
-        const isUser = await usermodel.findOne({ email: payload.email }, { id: 1, name: 1, email: 1, password: 1 })
+        const isUser = await usermodel.findOne({ email: payload.email }, { id: 1, name: 1, email: 1, password: 1 ,token:1})
         if(isUser){
             const token = jwt.sign({ email: payload.email }, process.env.JWT_KEY, { expiresIn: "1hr" })
             const addlink= await usermodel.updateOne({email:payload.email},{$set:{verify_link:token}})
@@ -47,7 +47,7 @@ userRoutes.post('/resetPass', async (req, res) => {
                     console.log('Email sent: ' + info.response);
                 }
             });
-            res.send(token)
+            res.send(addlink)
         }else{
             res.status(500).send("no email registered")
         }
@@ -62,7 +62,7 @@ userRoutes.post('/resetPass', async (req, res) => {
 userRoutes.get("/userInfo/:email", async (req, res) => {
     try {
         const { email } = req.params
-        const userInfo = await usermodel.findOne({ email }, { id: 1, name: 1, email: 1, role: 1, _id: 0 })
+        const userInfo = await usermodel.findOne({ email }, { id: 1, name: 1, email: 1, role: 1, _id: 0 ,token:1 })
         res.send(userInfo)
     } catch (err) {
         res.status(500).send(err.message)
