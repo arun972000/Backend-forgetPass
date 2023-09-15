@@ -6,7 +6,7 @@ import cors from "cors"
 
 
 const app = express();
-app.use(cors({origin:"https://backend-login-lbyr.onrender.com/"}))
+app.use(cors({origin:"*"}))
 
 await DBclient();
 
