@@ -40,10 +40,6 @@ userRoutes.post('/resetPass', async (req, res) => {
             const token = jwt.sign({ email: payload.email }, process.env.JWT_KEY, { expiresIn: "1hr" });
             const link = `${process.env.HOST}verifypass?token=${token}`;
             
-            // Update the user document with the token
-            const addLink = await usermodel.updateOne({ email: payload.email }, { $set: { verify_link: token } });
-
-            // Send the email with the verification link
             transporter.sendMail({ ...mailOptions, to: payload.email, text: `Please verify your email ${link}` }, function (error, info) {
                 if (error) {
                     console.log(error);
@@ -52,7 +48,7 @@ userRoutes.post('/resetPass', async (req, res) => {
                 }
             });
 
-            res.send(isUser);
+            res.send(token);
         } else {
             res.status(500).send("No email registered");
         }
@@ -67,7 +63,7 @@ userRoutes.post('/resetPass', async (req, res) => {
 userRoutes.get("/userInfo/:email", async (req, res) => {
     try {
         const { email } = req.params
-        const userInfo = await usermodel.findOne({ email }, { id: 1, name: 1, email: 1, role: 1, _id: 0 ,verify_link:1 })
+        const userInfo = await usermodel.findOne({ email }, { id: 1, name: 1, email: 1, role: 1, _id: 0  })
         res.send(userInfo)
     } catch (err) {
         res.status(500).send(err.message)
