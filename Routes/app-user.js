@@ -35,28 +35,33 @@ userRoutes.post("/register", async (req, res) => {
 userRoutes.post('/resetPass', async (req, res) => {
     try {
         const payload = req.body
-        const isUser = await usermodel.findOne({ email: payload.email }, { id: 1, name: 1, email: 1, password: 1 ,token:1})
-        if(isUser){
-            const token = jwt.sign({ email: payload.email }, process.env.JWT_KEY, { expiresIn: "1hr" })
-            const addlink= await usermodel.updateOne({email:payload.email},{$set:{verify_link:token}})
-            const link = `${process.env.HOST}verifypass?token=${token}`
-            transporter.sendMail({ ...mailOptions, to: payload.email, text: `please verify your email ${link}` }, function (error, info) {
+        const isUser = await usermodel.findOne({ email: payload.email });
+        if (isUser) {
+            const token = jwt.sign({ email: payload.email }, process.env.JWT_KEY, { expiresIn: "1hr" });
+            const link = `${process.env.HOST}verifypass?token=${token}`;
+            
+            // Update the user document with the token
+            const addLink = await usermodel.updateOne({ email: payload.email }, { $set: { verify_link: token } });
+
+            // Send the email with the verification link
+            transporter.sendMail({ ...mailOptions, to: payload.email, text: `Please verify your email ${link}` }, function (error, info) {
                 if (error) {
                     console.log(error);
                 } else {
                     console.log('Email sent: ' + info.response);
                 }
             });
-            res.send(addlink)
-        }else{
-            res.status(500).send("no email registered")
+
+            res.send(isUser);
+        } else {
+            res.status(500).send("No email registered");
         }
-
     } catch (err) {
-        console.log(err)
+        console.log(err);
+        res.status(500).send("Internal server error");
     }
+});
 
-})
 
 
 userRoutes.get("/userInfo/:email", async (req, res) => {

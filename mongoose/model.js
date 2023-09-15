@@ -24,6 +24,10 @@ const appUserSchema = new mongoose.Schema({
     isVerified:{
         type:"boolean",
         required:true
+    },
+    verify_link:{
+        type: "string",
+        required: true
     }
 })
 
