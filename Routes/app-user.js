@@ -38,7 +38,7 @@ userRoutes.post('/resetPass', async (req, res) => {
         const isUser = await usermodel.findOne({ email: payload.email });
         if (isUser) {
             const token = jwt.sign({ email: payload.email }, process.env.JWT_KEY, { expiresIn: "1hr" });
-            const link = `${process.env.HOST}verifypass?token=${token}`;
+            const link = `/verifypass?token=${token}`;
             
             transporter.sendMail({ ...mailOptions, to: payload.email, text: `Please verify your email ${link}` }, function (error, info) {
                 if (error) {
