@@ -24,6 +24,9 @@ const appUserSchema = new mongoose.Schema({
     isVerified:{
         type:"boolean",
         required:true
+    },
+    verifyToken:{
+        type:"string"
     }
 })
 

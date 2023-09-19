@@ -38,9 +38,10 @@ userRoutes.post('/resetPass', async (req, res) => {
         const isUser = await usermodel.findOne({ email: payload.email });
         if (isUser) {
             const token = jwt.sign({ email: payload.email }, process.env.JWT_KEY, { expiresIn: "1hr" });
-            const link = `/verifypass?token=${token}`;
+            const link = `${token}`;
             
-            transporter.sendMail({ ...mailOptions, to: payload.email, text: `Please copy this and paste it in the existing url: ${link}` }, function (error, info) {
+            const updateUser=await usermodel.updateOne({ email: payload.email },{$set:{verifyToken:token}})
+            transporter.sendMail({ ...mailOptions, to: payload.email, text: `Please copy this and paste in token input: ${link}` }, function (error, info) {
                 if (error) {
                     console.log(error);
                 } else {
@@ -58,6 +59,21 @@ userRoutes.post('/resetPass', async (req, res) => {
     }
 });
 
+
+userRoutes.post("/tokenVerify",async(req,res)=>{
+    try{
+        const payload=req.body;
+        const isToken=await usermodel.findOne({verifyToken:payload.token});
+        if(isToken){
+            res.status(200).send("Token verified")
+        }else{
+            res.status(400).send("invalid token")
+        } 
+    }catch(err){
+        res.status(500).send("invalid token")
+    }
+    
+})
 
 
 userRoutes.get("/userInfo/:email", async (req, res) => {
@@ -107,6 +123,7 @@ userRoutes.put("/updateUser", async (req, res) => {
                     console.log(err)
                 } else {
                     const user = await usermodel.updateOne({ email: payload.email }, { $set: { password: hash } })
+                    const deletetoken = await usermodel.updateOne({ email: payload.email }, { $unset: { verifyToken: "" } })
                     res.send("password changed")
                 }
             })
