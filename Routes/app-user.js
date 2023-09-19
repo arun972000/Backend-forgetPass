@@ -14,7 +14,7 @@ userRoutes.post("/register", async (req, res) => {
         const payload = req.body
         const isUser = await usermodel.findOne({ email: payload.email }, { id: 1, email: 1, name: 1, role: 1, isVerified: 1, _id: 0 })
         if (isUser) {
-            return res.send("user already exist")
+            return res.status(409).send("user already exist")
 
         }
         bcrypt.hash(payload.password, 10, async (err, hash) => {
