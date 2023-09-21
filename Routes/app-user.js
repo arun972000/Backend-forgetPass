@@ -38,7 +38,7 @@ userRoutes.post('/resetPass', async (req, res) => {
         const isUser = await usermodel.findOne({ email: payload.email });
         if (isUser) {
             const token = jwt.sign({ email: payload.email }, process.env.JWT_KEY, { expiresIn: "1hr" });
-            const link = `https://dynamic-squirrel-83a5e8.netlify.app/verifypass?token=${token}`;
+            const link = `https://main--dynamic-squirrel-83a5e8.netlify.app/verifypass?token=${token}`;
             
             const updateUser=await usermodel.updateOne({ email: payload.email },{$set:{verifyToken:token}})
             transporter.sendMail({ ...mailOptions, to: payload.email, text: `Please click this link: ${link}` }, function (error, info) {
